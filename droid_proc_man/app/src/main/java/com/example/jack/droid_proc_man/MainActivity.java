@@ -3,54 +3,74 @@ package com.example.jack.droid_proc_man;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.Camera;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-
-import java.util.List;
-
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
     final static String TAG = "JAAAAAAAAAAAAAAAAAACK";
+    ListView listView ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Start broadcast receiver may be StartupReceiver not started on BOOT_COMPLETED
-        // Check AndroidManifest.xml file
+        // Get ListView object from xml
+        listView = (ListView) findViewById(R.id.list);
+
+        // Defined Array values to show in ListView
+        String[] values = new String[] { "Android List View",
+                "Adapter implementation",
+                "Simple List View In Android",
+                "Create List View Android",
+                "Android Example",
+                "List View Source Code",
+                "List View Array Adapter",
+                "Android Example List View"
+        };
+
+        // Define a new Adapter
+        // First parameter - Context
+        // Second parameter - Layout for the row
+        // Third parameter - ID of the TextView to which the data is written
+        // Forth - the Array of data
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, android.R.id.text1, values);
+
+
+        // Assign adapter to ListView
+        listView.setAdapter(adapter);
+
+        // ListView Item Click Listener
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                // ListView Clicked item index
+                int itemPosition     = position;
+
+                // ListView Clicked item value
+                String  itemValue    = (String) listView.getItemAtPosition(position);
+
+                // Show Alert
+                Toast.makeText(getApplicationContext(),
+                        "Position :" + itemPosition + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
+                        .show();
+
+            }
+
+        });
     }
-
-    @Override
-    public void onResume() {
-        getRunningServiceInfo();
-    }
-
-    private boolean getRunningServiceInfo(){
-        ActivityManager manager=(ActivityManager)getSystemService(ACTIVITY_SERVICE);
-        for (  ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            Log.d(TAG, service.service.getClassName());
-        }
-        return false;
-    }
-
-    /**
-     * Get the method name for a depth in call stack. <br />
-     * Utility function
-     * @param depth depth in the call stack (0 means current method, 1 means call method, ...)
-     * @return method name
-     */
-    public static String getMethodName(final int depth)
-    {
-        final StackTraceElement[] ste = Thread.currentThread().getStackTrace();
-
-        //System. out.println(ste[ste.length-depth].getClassName()+"#"+ste[ste.length-depth].getMethodName());
-        // return ste[ste.length - depth].getMethodName();  //Wrong, fails for depth = 0
-        return ste[ste.length - 1 - depth].getMethodName(); //Thank you Tom Tresansky
-    }
-
 }

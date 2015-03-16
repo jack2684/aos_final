@@ -13,6 +13,7 @@ import android.hardware.Camera;
 import android.hardware.camera2.CameraManager;
 import android.location.GpsStatus;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -32,9 +33,11 @@ public class MainActivity extends Activity {
 
     final static String TAG = "JAAAAAAAAAAAAAAAAAACK";
     ListView listView ;
-    boolean mic, spk, msc, blt, cam;
+    boolean mic, spk, msc, blt, cam, loc;
     AudioManager am;
     ArrayList<ResInfo> arrayOfResInfo;
+
+    LocationManager locationManager;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -60,6 +63,8 @@ public class MainActivity extends Activity {
         this.registerReceiver(mReceiver, filter2);
         this.registerReceiver(mReceiver, filter3);
 
+        // http://stackoverflow.com/questions/843675/how-do-i-find-out-if-the-gps-of-an-android-device-is-enabled
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -91,53 +96,22 @@ public class MainActivity extends Activity {
         spk = am.isSpeakerphoneOn();
         msc = am.isMusicActive();
         cam = isCameraUsebyApp();
+        loc = isGPSon();
         arrayOfResInfo.add(new ResInfo("Microphone", mic));
         arrayOfResInfo.add(new ResInfo("Speaker", spk));
         arrayOfResInfo.add(new ResInfo("Music", msc));
         arrayOfResInfo.add(new ResInfo("Camera", cam));
         arrayOfResInfo.add(new ResInfo("Bluetooth", blt));
+        arrayOfResInfo.add(new ResInfo("GPS", loc));
     }
 
-    // http://stackoverflow.com/questions/15453576/android-check-if-gps-is-searching-has-fix-or-is-not-in-use
-    public GpsStatus.Listener mGPSStatusListener = new GpsStatus.Listener()
-    {
-        public void onGpsStatusChanged(int event)
-        {
-            switch(event)
-            {
-                case GpsStatus.GPS_EVENT_STARTED:
-//                    Toast.makeText(mContext, "GPS_SEARCHING", Toast.LENGTH_SHORT).show();
-                    System.out.println("TAG - GPS searching: ");
-                    break;
-                case GpsStatus.GPS_EVENT_STOPPED:
-                    System.out.println("TAG - GPS Stopped");
-                    break;
-                case GpsStatus.GPS_EVENT_FIRST_FIX:
-
-                /*
-                 * GPS_EVENT_FIRST_FIX Event is called when GPS is locked
-                 */
-//                    Toast.makeText(mContext, "GPS_LOCKED", Toast.LENGTH_SHORT).show();
-                    Location gpslocation = locationManager
-                            .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-                    if(gpslocation != null)
-                    {
-                        System.out.println("GPS Info:"+gpslocation.getLatitude()+":"+gpslocation.getLongitude());
-
-                    /*
-                     * Removing the GPS status listener once GPS is locked
-                     */
-                        locationManager.removeGpsStatusListener(mGPSStatusListener);
-                    }
-
-                    break;
-                case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
-                    //                 System.out.println("TAG - GPS_EVENT_SATELLITE_STATUS");
-                    break;
-            }
+    public boolean isGPSon() {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            return true;
+        }else{
+            return false;
         }
-    };
+    }
 
     // http://stackoverflow.com/questions/15862621/how-to-check-if-camera-is-opened-by-any-application
     public boolean isCameraUsebyApp() {

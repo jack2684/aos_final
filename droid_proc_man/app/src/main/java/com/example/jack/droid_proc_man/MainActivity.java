@@ -48,13 +48,6 @@ public class MainActivity extends Activity {
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.listview);
 
-        // Construct the data source
-        arrayOfResInfo = new ArrayList<>();
-        updateStates();
-        // Create the adapter to convert the array to views
-        ResInfoAdapter adapter = new ResInfoAdapter(this, arrayOfResInfo);
-        // Attach the adapter to a ListView
-        listView.setAdapter(adapter);
 
         IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
         IntentFilter filter2 = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
@@ -65,6 +58,14 @@ public class MainActivity extends Activity {
 
         // http://stackoverflow.com/questions/843675/how-do-i-find-out-if-the-gps-of-an-android-device-is-enabled
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        // Construct the data source
+        arrayOfResInfo = new ArrayList<>();
+        updateStates();
+        // Create the adapter to convert the array to views
+        ResInfoAdapter adapter = new ResInfoAdapter(this, arrayOfResInfo);
+        // Attach the adapter to a ListView
+        listView.setAdapter(adapter);
 
         // ListView Item Click Listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
